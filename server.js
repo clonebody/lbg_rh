@@ -14,16 +14,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //app.use()
 
-app.use(session({
-    secret: 'lbg', //secret的值建议使用随机字符串
-    cookie: {maxAge: 60 * 1000 * 30} // 过期时间（毫秒）
-}));
+//app.use(session({
+//    secret: 'lbg', //secret的值建议使用随机字符串
+//    cookie: {maxAge: 60 * 1000 * 30} // 过期时间（毫秒）
+//}));
 
-app.use('/login', require('./routes/login'));
-app.use('/home', require('./routes/home'));
-app.use('/tableList', require('./routes/tableList'));
-app.use('/tableSetting', require('./routes/tableSetting'));
-app.use('/gamePlay', require('./routes/gamePlay'));
+//app.use('/login', require('./routes/login'));
+//app.use('/home', require('./routes/home'));
+//app.use('/tableList', require('./routes/tableList'));
+//app.use('/tableSetting', require('./routes/tableSetting'));
+//app.use('/gamePlay', require('./routes/gamePlay'));
 
 //app.use(session({
 //    secret: '111', //secret的值建议使用随机字符串
