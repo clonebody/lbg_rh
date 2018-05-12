@@ -2,7 +2,8 @@
 var express = require('express'),
     app     = express(),
     morgan  = require('morgan'),
-    path    = require('path');
+    path    = require('path'),
+    session = require('express-session');
     
 Object.assign=require('object-assign')
 
@@ -11,7 +12,36 @@ app.set('view engine', 'jade');
 app.use(morgan('combined'))
 app.use(express.static(path.join(__dirname, 'public')));
 
-var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
+//app.use()
+
+app.use(session({
+    secret: 'lbg', //secret的值建议使用随机字符串
+    cookie: {maxAge: 60 * 1000 * 30} // 过期时间（毫秒）
+}));
+
+app.use('/login', require('./routes/login'));
+app.use('/home', require('./routes/home'));
+app.use('/tableList', require('./routes/tableList'));
+app.use('/tableSetting', require('./routes/tableSetting'));
+app.use('/gamePlay', require('./routes/gamePlay'));
+
+//app.use(session({
+//    secret: '111', //secret的值建议使用随机字符串
+//    cookie: {maxAge: 60 * 1000 * 30} // 过期时间（毫秒）
+//}));
+//
+//app.get('/sessionTest', function (req, res) {
+//    if (req.session.sign) {//检查用户是否已经登录
+//        console.log(req.session);//打印session的值
+//        res.send('welecome <strong>' + req.session.name + '</strong>, 欢迎你再次登录');
+//    } else {//否则展示index页面
+//        req.session.sign = true;
+//        req.session.name = '111';
+//        res.end('欢迎登陆！');
+//    }
+//});
+
+var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8000,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
     mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
     mongoURLLabel = "";
@@ -32,9 +62,11 @@ if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
     // Provide UI label that excludes user id and pw
     mongoURLLabel += mongoHost + ':' + mongoPort + '/' + mongoDatabase;
     mongoURL += mongoHost + ':' +  mongoPort + '/' + mongoDatabase;
-
   }
 }
+console.log('urll:\n'+mongoURLLabel);
+console.log('url:\n'+mongoURL);
+
 var db = null,
     dbDetails = new Object();
 
