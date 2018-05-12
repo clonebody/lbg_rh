@@ -99,7 +99,7 @@ app.use('/login', require(path.join(__dirname, 'routes/login')));
 //app.use('/home', require('./routes/home'));
 //app.use('/tableList', require('./routes/tableList'));
 //app.use('/tableSetting', require('./routes/tableSetting'));
-app.use('/gamePlay', require(path.join(__dirname, 'routes/gamePlay'));
+app.use('/gamePlay', require(path.join(__dirname, 'routes/gamePlay')));
 
 
 
