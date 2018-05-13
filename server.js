@@ -83,7 +83,7 @@ app.get('/', function (req, res) {
   });
 });
 
-//app.get('/pagecount', function (req, res) {
+app.get('/pagecount', function (req, res) {
   // try to initialize the db on every request if it's not already
   // initialized.
   //if (!db) {
@@ -96,8 +96,8 @@ app.get('/', function (req, res) {
   //} else {
   //  res.send('{ pageCount: -1 }');
   //}
-//  res.send('{ pageCount: -1 }');
-//});
+  res.send('{ pageCount: -1 }');
+});
 
 app.use('/account', require(path.join(__dirname, 'routes/account')));
 app.use('/console', require(path.join(__dirname, 'routes/console')));
