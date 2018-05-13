@@ -1,6 +1,7 @@
 //  OpenShift sample Node application
 var express = require('express'),
     app     = express(),
+    session = require('express-session'),
     morgan  = require('morgan'),
     path    = require('path');
     
@@ -32,7 +33,6 @@ if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
     // Provide UI label that excludes user id and pw
     mongoURLLabel += mongoHost + ':' + mongoPort + '/' + mongoDatabase;
     mongoURL += mongoHost + ':' +  mongoPort + '/' + mongoDatabase;
-
   }
 }
 var db = null,
@@ -59,43 +59,48 @@ var initDb = function(callback) {
   });
 };
 
+var sessionConfig = {
+  cookie: {
+    maxAge: 2 * 60 * 60 * 1000
+  },
+  secret: process.env.COOKIES_SECRET_KEY
+}
+
+app.use(session(sessionConfig));
+
+app.use(function(req, res, next) {
+  if (!db) {
+    initDb(function(err){});
+  }
+  res.locals.db = db;
+  next();
+});
+
 app.get('/', function (req, res) {
-  // try to initialize the db on every request if it's not already
-  // initialized.
-  if (!db) {
-    initDb(function(err){});
-  }
-  if (db) {
-    var col = db.collection('counts');
-    // Create a document with request IP and current time of request
-    col.insert({ip: req.ip, date: Date.now()});
-    col.count(function(err, count){
-      if (err) {
-        console.log('Error running count. Message:\n'+err);
-      }
-      res.render('index', { docTitle : "tst" });
-    });
-  } else {
-    res.render('index', { docTitle : "tst2"});
-  }
+  res.render('home', {
+    docTitle : "桌游吧",
+    navTitle : "主页",    
+  });
 });
 
-app.get('/pagecount', function (req, res) {
+//app.get('/pagecount', function (req, res) {
   // try to initialize the db on every request if it's not already
   // initialized.
-  if (!db) {
-    initDb(function(err){});
-  }
-  if (db) {
-    db.collection('counts').count(function(err, count ){
-      res.send('{ pageCount: ' + count + '}');
-    });
-  } else {
-    res.send('{ pageCount: -1 }');
-  }
-});
+  //if (!db) {
+  //  initDb(function(err){});
+  //}
+  //if (db) {
+  //  db.collection('counts').count(function(err, count ){
+  //    res.send('{ pageCount: ' + count + '}');
+  //  });
+  //} else {
+  //  res.send('{ pageCount: -1 }');
+  //}
+//  res.send('{ pageCount: -1 }');
+//});
 
-app.use('/login', require(path.join(__dirname, 'routes/login')));
+app.use('/account', require(path.join(__dirname, 'routes/account')));
+app.use('/console', require(path.join(__dirname, 'routes/console')));
 //app.use('/home', require('./routes/home'));
 //app.use('/tableList', require('./routes/tableList'));
 //app.use('/tableSetting', require('./routes/tableSetting'));

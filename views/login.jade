@@ -1,53 +1,56 @@
-doctype html
-html
-  head
-    meta(http-equiv="Content-Type", content="text/html", charset="UTF-8")
-    meta(name="Description", content="描述")
-    meta(name="Keyword", content="键")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0")
-    meta(name="apple-mobile-web-app-capable", content="yes")
-    meta(name="apple-mobile-web-app-status-bar-style", content="black")
-    title 登陆
-    link(rel="stylesheet", href="http://www.dcloud.io/css/mui.min.css")
-    style
-      .mui-input-group {margin-top: 10px;}
-      .mui-content-padded {margin-top: 25px;}
-      .link-area {display: block; margin-top: 25px; text-align: center;}
-      .spliter {color: #bbb; padding: 0px 8px;}
-  body
-    header.mui-bar.mui-bar-nav
-      h1.mui-title 登录
-    .mui-content
-      form#login-form.mui-input-group
-        .mui-input-row
-          label 账号
-          input#account.mui-input-clear.mui-input(type="text", placeholder="请输入账号")
-        .mui-input-row
-          label 密码
-          input#password.mui-input-clear.mui-input(type="password", placeholder="请输入密码")
-      //form.mui-input-group
-      //  ul.mui-table-view.mui-table-view-chevron
-      //    li.mui-table-view-cell
-      //      自动登录
-      //      #autoLogin.mui-switch
-      //        .mui-switch-handle
-      .mui-content-padded
-        button#login.mui-btn.mui-btn-block.mui-btn-primary 登录
-        .link-area
-          a#reg 注册账号
-          span.spliter |
-          a#forgetPassword 忘记密码
-      .mui-content-padded.oauth-area
-    script(src="http://www.dcloud.io/js/mui.min.js")
-    script.
-      mui.plusReady(function(){
-        //console.log("当前页面URL："+plus.webview.currentWebview().getURL());
-        alert("333");
-      });
-      //mui.ready(
-      //document.getElementById('login').addEventListener("tap", function(event) {
-      //  alert("222");
-      //})
-      //$("#login").addEventListener("tap", function(event) {
-      //  alert("222");
-      //})
+extends layout
+
+block style
+  style
+    .mui-input-group {margin-top: 10px;}
+    .mui-content-padded {margin-top: 25px;}
+    .link-area {display: block; margin-top: 25px; text-align: center;}
+    .spliter {color: #bbb; padding: 0px 8px;}
+
+block content
+  form#login-form.mui-input-group
+    .mui-input-row
+      label 账号
+      input#account.mui-input-clear.mui-input(type="text", placeholder="请输入账号")
+    .mui-input-row
+      label 密码
+      input#password.mui-input-clear.mui-input(type="password", placeholder="请输入密码")
+  //form.mui-input-group
+  //  ul.mui-table-view.mui-table-view-chevron
+  //    li.mui-table-view-cell
+  //      自动登录
+  //      #autoLogin.mui-switch
+  //        .mui-switch-handle
+  .mui-content-padded
+    button#login.mui-btn.mui-btn-block.mui-btn-primary 登录
+    //.link-area
+    //  a#reg 注册账号
+    //  span.spliter |
+    //  a#forgetPassword 忘记密码
+  .mui-content-padded.oauth-area
+
+block script
+  script.
+    document.getElementById('login').addEventListener("tap", function(event) {
+      var account = document.getElementById('account').value;
+      var password = document.getElementById('password').value;        
+      if (account && password) {
+        var query = 'account=' + account + '&password=' + password;
+        mui.ajax('/account/check', {
+          data: query,      
+          dataType:'json',//服务器返回json格式数据
+          type:'get',//HTTP请求类型
+          timeout:10000,//超时时间设置为10秒；
+          headers:{'Content-Type':'application/json'},
+          success:function(data){
+            if (data.ret == 'ok') {
+              window.location="/account"
+            }
+          },
+          error:function(xhr,type,errorThrown){
+            //异常处理；
+            console.log(type);
+          },
+        })
+      }
+    });

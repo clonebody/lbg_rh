@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  ul.mui-table-view.mui-table-view-chevron
+    li.mui-table-view-cell.mui-media
+      a.mui-navigate-right
+        img#head-img.mui-media-object.mui-pull-left.head-img(src="")
+        .mui-media-body 账户 <br> #{account}
+  div.mui-content-padded
+    h5 参与游戏列表
+  ul.mui-table-view.mui-table-view-chevron
+    li.mui-table-view-cell.mui-media
+      a.mui-navigate-right(href="/tableSetting/1/")
+        .mui-media-body 123<br>234525<br>
+    li.mui-table-view-cell.mui-media
+      a.mui-navigate-right(href="/tableSetting/2/")
+        .mui-media-body 123<br>234525<br>
+  .mui-content-padded
+    button#tableList.mui-btn.mui-btn-block.mui-btn-primary 其他游戏
+
+block script
+  script.
+    document.getElementById('tableList').addEventListener("tap", function(event) {
+
+    });
