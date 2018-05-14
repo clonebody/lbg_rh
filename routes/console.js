@@ -3,7 +3,6 @@ var router = express.Router();
 
 router.use('/', 
     function(req, res, next) {
-        console.log(req.session);
         if (!req.session || !req.session.account || !req.session.admin) {
             res.redirect("/");
         } else {
@@ -24,7 +23,7 @@ router.use('/',
 
 router.get('/', function(req, res, next) {
     var db = res.locals.db;
-    var dbCol = db.collections();
+    var dbCol = db.listCollections({}, null);
 
     console.log(dbCol);
 
@@ -36,7 +35,7 @@ router.get('/', function(req, res, next) {
 router.get('/:col', function(req, res, next) {
     var col = req.params.col;
     var db = res.locals.db;
-    var dbCol = db.collection(col);
+    var dbCol = db.collection(col).find({}).toArray();
 
     if (dbCol) {
    	    console.log(dbCol);
