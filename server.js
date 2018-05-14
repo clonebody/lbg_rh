@@ -2,6 +2,7 @@
 var express = require('express'),
     app     = express(),
     session = require('express-session'),
+    MongoStore = require('connect-mongo')(session),
     morgan  = require('morgan'),
     path    = require('path');
     
@@ -35,10 +36,9 @@ if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
     mongoURL += mongoHost + ':' +  mongoPort + '/' + mongoDatabase;
   }
 }
-var db = null,
-    dbDetails = new Object();
 
-var initDb = function(callback) {
+var db = null;
+if (app.get('env') != "development") {
   if (mongoURL == null) return;
 
   var mongodb = require('mongodb');
@@ -51,19 +51,21 @@ var initDb = function(callback) {
     }
 
     db = conn;
-    dbDetails.databaseName = db.databaseName;
-    dbDetails.url = mongoURLLabel;
-    dbDetails.type = 'MongoDB';
-
     console.log('Connected to MongoDB at: %s', mongoURL);
-  });
-};
+  })
+}
 
 var sessionConfig = {
   cookie: {
     maxAge: 2 * 60 * 60 * 1000
   },
-  secret: process.env.COOKIES_SECRET_KEY
+  secret: process.env.COOKIES_SECRET_KEY,
+  saveUninitialized: false,
+  resave: false,
+}
+
+if (app.get('env') != "development") {
+  sessionConfig.store = new MongoStore({db : db})
 }
 
 app.use(session(sessionConfig));
@@ -105,8 +107,6 @@ app.use('/console', require(path.join(__dirname, 'routes/console')));
 //app.use('/tableList', require('./routes/tableList'));
 //app.use('/tableSetting', require('./routes/tableSetting'));
 app.use('/gamePlay', require(path.join(__dirname, 'routes/gamePlay')));
-
-
 
 // error handling
 app.use(function(err, req, res, next){

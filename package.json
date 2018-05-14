@@ -6,6 +6,7 @@
   "dependencies": {
     "chai": "^3.5.0",
     "chai-http": "^2.0.1",
+    "connect-mongo": "^2.0.1",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
     "mocha": "^2.4.5",
