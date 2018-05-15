@@ -2,7 +2,7 @@
 var express = require('express'),
     app     = express(),
     session = require('express-session'),
-    MongoStore = require('connect-mongo')(session),
+    MongoStore = require('connect-mongo')(express),
     morgan  = require('morgan'),
     path    = require('path');
     
