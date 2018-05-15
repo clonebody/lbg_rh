@@ -2,7 +2,7 @@
 var express = require('express'),
     app     = express(),
     session = require('express-session'),
-    MongoStore = require('connect-mongo')(express),
+    MongoStore = require('connect-mongo')(session),
     morgan  = require('morgan'),
     path    = require('path');
     
@@ -43,6 +43,14 @@ if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
 }
 
 var db = null;
+var sessionConfig = {
+  cookie: {
+    maxAge: 2 * 60 * 60 * 1000
+  },
+  secret: process.env.COOKIES_SECRET_KEY,
+  saveUninitialized: false,
+  resave: false,
+}
 if (app.get('env') != "development") {
   if (mongoURL == null) return;
 
@@ -57,25 +65,12 @@ if (app.get('env') != "development") {
     }
 
     db = conn;
+    sessionConfig.store = new MongoStore({db : db})
     console.log('Connected to MongoDB at: %s', mongoURL);
   })
 }
 
-var sessionConfig = {
-  cookie: {
-    maxAge: 2 * 60 * 60 * 1000
-  },
-  secret: process.env.COOKIES_SECRET_KEY,
-  saveUninitialized: false,
-  resave: false,
-}
-
-if (app.get('env') != "development") {
-  sessionConfig.store = new MongoStore({db : db})
-}
-
 app.use(session(sessionConfig));
-
 app.use(function(req, res, next) {
   res.locals.db = db;
   next();
