@@ -17,38 +17,69 @@ router.get('/', function(req, res, next) {
     }
 });
 
-router.get('/check', function(req, res, next) {
-    var account = req.query.account;
-    var password = req.query.password;
+router.get('/logout', function(req, res, next) {
+    req.session.destroy();
+    res.redirect("/");
+});
+
+router.get('/register', function(req, res, next) {
+    res.render('register' , {
+        docTitle : "注册",
+        navTitle : "注册",
+    });
+});
+
+router.post('/check', function(req, res, next) {
+    var action = req.body.action || "login";
+    var account = req.body.account;
+    var password = req.body.password;
     var valid = false;
 
     if (account && password) {
-        if (account == password) {
-            valid = true;    
-        }        
+        if (req.app.get('env') == "development") {
+            valid = true;
+        } else {
+            var db = res.locals.db;
+            var collection = db.collection('account');
+            collection.find({account : account}).toArray(function(err, docs) {
+                console.log(docs);
+                if (action == "login") {
+                    if (docs.length == 1) {
+                        console.log("login account:");
+                        console.log(account + ":" + password);                                
+                        valid = true;
+                    }
+                } else if (action == "register") {
+                    if (docs.length == 0) {
+                        collection.insertOne({
+                            account : account, 
+                            password : password
+                        }, function(err, r) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                console.log("create account:");
+                                console.log(account + ":" + password);
+                                valid = true;
+                            }
+                        });
+                    }
+                }
+            });
+        }
     }
+
     if (valid) {
         req.session.account = account;
-        console.log("acc \n");
-        console.log(account);
-        console.log("admin acc \n");
-        console.log(process.env.ADMIN_ACCOUNT);
-        
         if (process.env.ADMIN_ACCOUNT == account) {
             req.session.admin = true;
         } else {
             req.session.admin = false;
         }
-        console.log(req.session);
         res.send({ret:"ok"});
     } else {
         res.send({ret:"fail"});
     }
-});
-
-router.get('/logout', function(req, res, next) {
-    req.session.destroy();
-    res.redirect("/");
 });
 
 module.exports = router;

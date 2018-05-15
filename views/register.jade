@@ -4,8 +4,6 @@ block style
   style
     .mui-input-group {margin-top: 10px;}
     .mui-content-padded {margin-top: 25px;}
-    .link-area {display: block; margin-top: 25px; text-align: center;}
-    .spliter {color: #bbb; padding: 0px 8px;}
 
 block content
   form#login-form.mui-input-group
@@ -15,31 +13,25 @@ block content
     .mui-input-row
       label 密码
       input#password.mui-input-clear.mui-input(type="password", placeholder="请输入密码")
-  //form.mui-input-group
-  //  ul.mui-table-view.mui-table-view-chevron
-  //    li.mui-table-view-cell
-  //      自动登录
-  //      #autoLogin.mui-switch
-  //        .mui-switch-handle
+    .mui-input-row
+      label 邀请码
+      input#invitation.mui-input-clear.mui-input(type="text", placeholder="请输入邀请码")
   .mui-content-padded
-    button#login.mui-btn.mui-btn-block.mui-btn-primary 登录
-    .link-area
-      a#reg(href="/account/register") 注册账号
-    //  span.spliter |
-    //  a#forgetPassword 忘记密码
-  .mui-content-padded.oauth-area
+    button#register.mui-btn.mui-btn-block.mui-btn-primary 注册
 
 block script
   script.
-    document.getElementById('login').addEventListener("tap", function(event) {
+    document.getElementById('register').addEventListener("tap", function(event) {
       var account = document.getElementById('account').value;
       var password = document.getElementById('password').value;
+      var invitation = document.getElementById('invitation').value;
       if (account && password) {
         mui.ajax('/account/check', {
           data: {
-            action : "login",
+            action : "register",
             account: account,
             password : password,
+            invitation : invitation,
           },      
           dataType:'json',//服务器返回json格式数据
           type:'post',//HTTP请求类型

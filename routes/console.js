@@ -35,18 +35,20 @@ router.get('/', function(req, res, next) {
 router.get('/:col', function(req, res, next) {
     var col = req.params.col;
     var db = res.locals.db;
-    var dbCol = db.collection(col).find({}).toArray();
 
-    if (dbCol) {
-   	    console.log(dbCol);
-   	    res.render('console' , {
-   	        context : "222",
-   	    });
-    } else {
-    	res.render('console' , {
-            context : "no " + col,
-         });
-    }
+    db.collection(col).find({}).toArray(function(err, docs) {
+        if (err) {
+            res.render('console' , {
+                context : "no " + col,
+            });
+        } else {
+            console.log(docs)
+            callback(docs);
+            res.render('console' , {
+                context : "222",
+            });
+        };
+    });
 });
 
 
