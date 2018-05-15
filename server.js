@@ -51,6 +51,7 @@ if (app.get('env') != "development") {
 
   mongodb.connect(mongoURL, function(err, conn) {
     if (err) {
+      console.log(err); 
       callback(err);
       return;
     }
