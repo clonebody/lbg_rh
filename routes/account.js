@@ -35,9 +35,23 @@ router.post('/check', function(req, res, next) {
     var password = req.body.password;
     var valid = false;
 
+    var success = function() {
+        req.session.account = account;
+        if (process.env.ADMIN_ACCOUNT == account) {
+            req.session.admin = true;
+        } else {
+            req.session.admin = false;
+        }
+        res.send({ret:"ok"});
+    }
+
+    var fail = function() {
+        res.send({ret:"fail"});
+    }
+
     if (account && password) {
         if (req.app.get('env') == "development") {
-            valid = true;
+            success();
         } else {
             var db = res.locals.db;
             var collection = db.collection('account');
@@ -45,9 +59,8 @@ router.post('/check', function(req, res, next) {
                 console.log(docs);
                 if (action == "login") {
                     if (docs.length == 1) {
-                        console.log("login account:");
-                        console.log(account + ":" + password);                                
-                        valid = true;
+                        success();
+                        return;
                     }
                 } else if (action == "register") {
                     if (docs.length == 0) {
@@ -58,27 +71,17 @@ router.post('/check', function(req, res, next) {
                             if (err) {
                                 console.log(err);
                             } else {
-                                console.log("create account:");
-                                console.log(account + ":" + password);
-                                valid = true;
+                                success();
+                                return;
                             }
                         });
                     }
                 }
+                fail();
             });
         }
-    }
-
-    if (valid) {
-        req.session.account = account;
-        if (process.env.ADMIN_ACCOUNT == account) {
-            req.session.admin = true;
-        } else {
-            req.session.admin = false;
-        }
-        res.send({ret:"ok"});
     } else {
-        res.send({ret:"fail"});
+        fail();
     }
 });
 

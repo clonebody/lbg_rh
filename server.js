@@ -43,23 +43,7 @@ if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
 }
 
 var db = null;
-if (app.get('env') != "development") {
-  if (mongoURL == null) return;
-
-  var mongodb = require('mongodb');
-  if (mongodb == null) return;
-
-  mongodb.connect(mongoURL, function(err, conn) {
-    if (err) {
-      callback(err);
-      return;
-    }
-
-    db = conn;
-    console.log('Connected to MongoDB at: %s', mongoURL);
-  })
-}
-
+var dbPromise = null;
 var sessionConfig = {
   cookie: {
     maxAge: 2 * 60 * 60 * 1000
@@ -70,7 +54,26 @@ var sessionConfig = {
 }
 
 if (app.get('env') != "development") {
-  sessionConfig.store = new MongoStore({db : db})
+  if (mongoURL == null) return;
+
+  var mongodb = require('mongodb');
+  if (mongodb == null) return;
+
+  var dbPromise = new Promise((resolve, reject) => {
+    mongodb.connect(mongoURL, function(err, conn) {
+      if (err) {
+        return reject(err);
+      }
+      resolve(conn);
+    })
+  });
+
+  dbPromise.then(function(conn) {
+    db = conn;
+    console.log('Connected to MongoDB at: %s', mongoURL);
+  })
+
+  sessionConfig.store = new MongoStore({dbPromise: dbPromise});
 }
 
 app.use(session(sessionConfig));
