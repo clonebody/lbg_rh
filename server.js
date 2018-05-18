@@ -99,7 +99,7 @@ if (app.get('env') != "development") {
           if (err) {
             reject(err);
           } else {
-            resolve(docs);
+            resolve(item);
           }
         })
       })

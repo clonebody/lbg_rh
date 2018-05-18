@@ -1,6 +1,22 @@
 var express = require('express');
 var router = express.Router();
 
+router.get('/', function(req, res, next) {
+    req.app.locals.opr.needLogin(req, res, next);
+}, function(req, res, next) {
+    res.render('account' , {
+        account : res.locals.account,
+    });
+});
+
+router.get('/setting', function(req, res, next) {
+    req.app.locals.opr.needLogin(req, res, next);
+}, function(req, res, next) {
+    res.render('setting' , {
+        account : res.locals.account,
+    });
+});
+
 router.get('/logout', function(req, res, next) {
     req.session.destroy();
     res.redirect("/");
@@ -75,22 +91,6 @@ router.post('/action', function(req, res, next) {
     } else {
         fail();
     }
-});
-
-router.use("/", function(req, res, next) {
-    req.app.locals.opr.needLogin(req, res, next);
-});
-
-router.get('/', function(req, res, next) {
-    res.render('account' , {
-        account : res.locals.account,
-    });
-});
-
-router.get('/setting', function(req, res, next) {
-    res.render('setting' , {
-        account : res.locals.account,
-    });
 });
 
 module.exports = router;
