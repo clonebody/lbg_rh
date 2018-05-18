@@ -2,13 +2,22 @@ extends layout
 
 block navLeft
 
-block style
+block navHome
+
+block head
+  title 体验桌游吧
   style
     .mui-content-padded {margin-top: 25px;}
+
+block navTitle
+  h1.mui-title 主页
 
 block content
   .mui-content-padded
     button#startGame.mui-btn.mui-btn-block.mui-btn-primary 开始游戏
+  .mui-content-padded
+    button#gameTool.mui-btn.mui-btn-block 游戏工具
+
 
 block script
   script.

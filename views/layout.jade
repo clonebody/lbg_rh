@@ -5,14 +5,16 @@ html
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0")
     meta(name="apple-mobile-web-app-capable", content="yes")
     meta(name="apple-mobile-web-app-status-bar-style", content="black")
-    title= docTitle
     link(rel="stylesheet", href="https://cdn.bootcss.com/mui/3.7.1/css/mui.min.css")
-    block style
+    block head
   body
     header.mui-bar.mui-bar-nav
       block navLeft
         a.mui-action-back.mui-icon.mui-icon-back.mui-pull-left
-      h1.mui-title= navTitle
+      block navTitle
+        h1.mui-title= navTitle
+      block navHome
+        a.mui-icon.mui-icon-home.mui-pull-right(href="/")
     .mui-content
       block content
     script(src="https://cdn.bootcss.com/mui/3.7.1/js/mui.min.js")

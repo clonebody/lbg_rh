@@ -1,11 +1,15 @@
 extends layout
 
-block style
+block head
+  title 登陆
   style
     .mui-input-group {margin-top: 10px;}
     .mui-content-padded {margin-top: 25px;}
     .link-area {display: block; margin-top: 25px; text-align: center;}
     .spliter {color: #bbb; padding: 0px 8px;}
+
+block navTitle
+  h1.mui-title 登陆
 
 block content
   form#login-form.mui-input-group
@@ -22,7 +26,7 @@ block content
   //      #autoLogin.mui-switch
   //        .mui-switch-handle
   .mui-content-padded
-    button#login.mui-btn.mui-btn-block.mui-btn-primary 登录
+    button#login.mui-btn.mui-btn-block.mui-btn-primary(data-loading-text="登陆中") 登录
     .link-area
       a#reg(href="/account/register") 注册账号
     //  span.spliter |
@@ -34,8 +38,10 @@ block script
     document.getElementById('login').addEventListener("tap", function(event) {
       var account = document.getElementById('account').value;
       var password = document.getElementById('password').value;
+      var item = mui(this);
       if (account && password) {
-        mui.ajax('/account/check', {
+        item.button('loading');
+        mui.ajax('/account/action', {
           data: {
             action : "login",
             account: account,
@@ -45,13 +51,21 @@ block script
           type:'post',//HTTP请求类型
           timeout:10000,//超时时间设置为10秒；
           headers:{'Content-Type':'application/json'},
-          success:function(data){
-            if (data.ret == 'ok') {
-              window.location="/account"
+          success:function(ret){
+            if (ret.ret == 'ok') {
+              mui.toast("登陆成功");
+              location.reload();
+            } else  {
+              item.button('reset');
+              if (ret.ret == 'fail'){
+                mui.toast(ret.err);
+              } else {
+                console.log(ret);
+              }
             }
           },
           error:function(xhr,type,errorThrown){
-            //异常处理；
+            item.button('reset');
             console.log(type);
           },
         })

@@ -1,9 +1,13 @@
 extends layout
 
-block style
+block head
+  title 注册
   style
     .mui-input-group {margin-top: 10px;}
     .mui-content-padded {margin-top: 25px;}
+
+block navTitle
+  h1.mui-title 注册
 
 block content
   form#login-form.mui-input-group
@@ -17,7 +21,7 @@ block content
       label 邀请码
       input#invitation.mui-input-clear.mui-input(type="text", placeholder="请输入邀请码")
   .mui-content-padded
-    button#register.mui-btn.mui-btn-block.mui-btn-primary 注册
+    button#register.mui-btn.mui-btn-block.mui-btn-primary(data-loading-text="注册中") 注册
 
 block script
   script.
@@ -25,8 +29,10 @@ block script
       var account = document.getElementById('account').value;
       var password = document.getElementById('password').value;
       var invitation = document.getElementById('invitation').value;
+      var item = mui(this);
       if (account && password) {
-        mui.ajax('/account/check', {
+        item.button('loading');
+        mui.ajax('/account/action', {
           data: {
             action : "register",
             account: account,
@@ -37,13 +43,22 @@ block script
           type:'post',//HTTP请求类型
           timeout:10000,//超时时间设置为10秒；
           headers:{'Content-Type':'application/json'},
-          success:function(data){
-            if (data.ret == 'ok') {
-              window.location="/account"
+          success:function(ret){
+            if (ret.ret == 'ok') {
+              mui.toast("注册成功");
+              location="/account"
+            } else  {
+              item.button('reset');
+              if (ret.ret == 'fail'){
+                mui.toast(ret.err);
+              } else {
+                console.log(ret);
+              }
             }
           },
           error:function(xhr,type,errorThrown){
             //异常处理；
+            item.button('reset');
             console.log(type);
           },
         })

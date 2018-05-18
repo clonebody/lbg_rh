@@ -25,11 +25,11 @@ var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
 
 if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
   var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase(),
-      mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'],
-      mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'],
-      mongoDatabase = process.env[mongoServiceName + '_DATABASE'],
-      mongoPassword = process.env[mongoServiceName + '_PASSWORD']
-      mongoUser = process.env[mongoServiceName + '_USER'];
+    mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'],
+    mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'],
+    mongoDatabase = process.env[mongoServiceName + '_DATABASE'],
+    mongoPassword = process.env[mongoServiceName + '_PASSWORD']
+    mongoUser = process.env[mongoServiceName + '_USER'];
 
   if (mongoHost && mongoPort && mongoDatabase) {
     mongoURLLabel = mongoURL = 'mongodb://';
@@ -42,8 +42,6 @@ if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
   }
 }
 
-var db = null;
-var dbPromise = null;
 var sessionConfig = {
   cookie: {
     maxAge: 2 * 60 * 60 * 1000
@@ -52,6 +50,24 @@ var sessionConfig = {
   saveUninitialized: false,
   resave: false,
 }
+
+app.locals.opr = {
+  needLogin : function(req, res, next) {
+    if (!req.session || !req.session.account) {
+      res.render('login' , {});
+    } else {
+      req.app.locals.opr.getAccount(req.session.account)
+        .then(function(itemList) {
+          if(itemList.length == 1) {
+            res.locals.account = itemList[0];
+            next();
+          } else {
+            res.render('login' , {});
+          }
+        });
+    }
+  }
+};
 
 if (app.get('env') != "development") {
   if (mongoURL == null) return;
@@ -69,25 +85,68 @@ if (app.get('env') != "development") {
   });
 
   dbPromise.then(function(conn) {
-    db = conn;
     console.log('Connected to MongoDB at: %s', mongoURL);
+
+    var accountCol = conn.collection('account');
+
+    app.locals.opr.newAccount = function(invitation, item) {
+      return new Promise((resolve, reject) => {
+        if (invitation != process.env.ADMIN_ACCOUNT) {
+          reject("邀请码错误");
+          return;
+        }
+        accountCol.insertOne(item, function(err, r) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(docs);
+          }
+        })
+      })
+    };
+  
+    app.locals.opr.getAccount = function(account) {
+      return new Promise((resolve, reject) => {
+        accountCol.find({account : account}).toArray(function(err, docs) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(docs);
+          }
+        })
+      })
+    };
   })
 
   sessionConfig.store = new MongoStore({dbPromise: dbPromise});
+} else {
+  var accountArray = new Array();
+
+  app.locals.opr.newAccount = function(invitation, item) {
+    return new Promise((resolve, reject) => {
+      accountArray.push(item);
+      resolve(item);
+    })
+  }
+
+  app.locals.opr.getAccount = function(account) {
+    return new Promise((resolve, reject) => {
+      var ret = new Array();
+      for (key in accountArray) {
+        var item = accountArray[key];
+        if (item.account == account) {
+          ret.push(item);
+        }
+      }
+      resolve(ret);
+    })
+  }
 }
 
 app.use(session(sessionConfig));
 
-app.use(function(req, res, next) {
-  res.locals.db = db;
-  next();
-});
-
 app.get('/', function (req, res) {
-  res.render('home', {
-    docTitle : "桌游吧",
-    navTitle : "主页",    
-  });
+  res.render('home', {});
 });
 
 app.get('/pagecount', function (req, res) {
@@ -108,9 +167,9 @@ app.get('/pagecount', function (req, res) {
 
 app.use('/account', require(path.join(__dirname, 'routes/account')));
 app.use('/console', require(path.join(__dirname, 'routes/console')));
-//app.use('/home', require('./routes/home'));
-//app.use('/tableList', require('./routes/tableList'));
-//app.use('/tableSetting', require('./routes/tableSetting'));
+app.use('/table', require(path.join(__dirname, 'routes/table')));
+//app.use('/console', require(path.join(__dirname, 'routes/console')));
+
 app.use('/gamePlay', require(path.join(__dirname, 'routes/gamePlay')));
 
 // error handling

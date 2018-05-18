@@ -1,88 +1,96 @@
 var express = require('express');
 var router = express.Router();
 
-router.get('/', function(req, res, next) {
-    if (!req.session || !req.session.account) {
-        res.render('login' , {
-            docTitle : "登陆",
-            navTitle : "登陆",
-        });
-    } else {
-        var account = req.session.account;
-        res.render('account' , {
-            docTitle : "用户",
-            navTitle : "账户",
-            account : account,
-        });
-    }
-});
-
 router.get('/logout', function(req, res, next) {
     req.session.destroy();
     res.redirect("/");
 });
 
 router.get('/register', function(req, res, next) {
-    res.render('register' , {
-        docTitle : "注册",
-        navTitle : "注册",
-    });
+    res.render('register' , {});
 });
 
-router.post('/check', function(req, res, next) {
+router.post('/action', function(req, res, next) {
     var action = req.body.action || "login";
-    var account = req.body.account;
-    var password = req.body.password;
-    var valid = false;
+    var account = req.body.account || "";
+    var password = req.body.password || "";
+    var invitation = req.body.invitation || "";
 
     var success = function() {
         req.session.account = account;
-        if (process.env.ADMIN_ACCOUNT == account) {
-            req.session.admin = true;
-        } else {
-            req.session.admin = false;
-        }
         res.send({ret:"ok"});
     }
 
-    var fail = function() {
-        res.send({ret:"fail"});
+    var fail = function(err) {
+        res.send({ret:"fail", err : err});
     }
 
     if (account && password) {
-        if (req.app.get('env') == "development") {
-            success();
-        } else {
-            var db = res.locals.db;
-            var collection = db.collection('account');
-            collection.find({account : account}).toArray(function(err, docs) {
-                console.log(docs);
-                if (action == "login") {
-                    if (docs.length == 1) {
+        var opr = req.app.locals.opr;
+        switch(action) {
+        case "register":
+            opr.getAccount(account).then(function(itemList) {
+                if (itemList.length == 0) {
+                    opr.newAccount(invitation, {account : account, password : password}).then(
+                        function(item) {
+                            success();
+                        },
+                        function(err) {
+                            fail(err);
+                        }
+                    );
+                } else {
+                    fail("用户已存在");
+                } 
+            }, function(err) {
+                fail(err);
+            })
+            break;
+        case "login":
+            opr.getAccount(account).then(function(itemList) {
+                if (itemList.length == 1) {
+                    var item = itemList[0];
+                    if (item.password == password) {
                         success();
-                        return;
+                    } else {
+                        fail("密码错误");
                     }
-                } else if (action == "register") {
-                    if (docs.length == 0) {
-                        collection.insertOne({
-                            account : account, 
-                            password : password
-                        }, function(err, r) {
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                success();
-                                return;
-                            }
-                        });
+                } else {
+                    if (itemList != 0) {
+                        console.log("dup account");
+                        console.log(itemList);
                     }
+                    fail("用户不存在");
                 }
-                fail();
-            });
+            }, function(err) {
+                fail(err);
+            })
+            break;
+        default:
+            console.log("unknown action :");
+            console.log(req.body);
+            fail("异常操作");
+            break;
         }
     } else {
         fail();
     }
+});
+
+router.use("/", function(req, res, next) {
+    req.app.locals.opr.needLogin(req, res, next);
+});
+
+router.get('/', function(req, res, next) {
+    res.render('account' , {
+        account : res.locals.account,
+    });
+});
+
+router.get('/setting', function(req, res, next) {
+    res.render('setting' , {
+        account : res.locals.account,
+    });
 });
 
 module.exports = router;
