@@ -94,13 +94,14 @@ if (app.get('env') != "development") {
       return new Promise((resolve, reject) => {
         invitationCol.findOneAndDelete({invitation : invitation}).then(
           function (ret) {
-            if (ret.lastErrorObject.n == 1)
+            if (ret.lastErrorObject.n == 1) {
               accountCol.insertOne(item, function(err, r) {
                 if (err) {
                   reject(err);
                 } else {
                   resolve(item);
                 }
+              })
             } else {
               reject("邀请码无效");
             }
