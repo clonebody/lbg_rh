@@ -106,7 +106,6 @@ if (app.get('env') != "development") {
           },function (err) {
             console.log("err");
             console.log(err);
-            })
           })
       })
     };
