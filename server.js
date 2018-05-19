@@ -93,19 +93,21 @@ if (app.get('env') != "development") {
     app.locals.opr.newAccount = function(invitation, item) {
       return new Promise((resolve, reject) => {
         invitationCol.findOneAndDelete({invitation : invitation}).then(
-          function (docs) {
-            console.log("docs");
-            console.log(docs);
-            accountCol.insertOne(item, function(err, r) {
-              if (err) {
-                reject(err);
-              } else {
-                resolve(item);
-              }
-            })
+          function (ret) {
+            if (ret.lastErrorObject.n == 1)
+              accountCol.insertOne(item, function(err, r) {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(item);
+                }
+            } else {
+              reject("邀请码无效");
+            }
           },function (err) {
             console.log("err");
             console.log(err);
+            reject(err);
           })
       })
     };
