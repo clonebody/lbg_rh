@@ -1,4 +1,14 @@
-doctype html
-html
-  body
-    p #{context}
+extends layout
+
+block head
+  title 控制台
+
+block navTitle
+  h1.mui-title 控制台
+
+block content
+  ul.mui-table-view.mui-table-view-chevron
+    li.mui-table-view-cell.mui-media
+      a.mui-navigate-right(href="/console/invitation") 邀请码
+    li.mui-table-view-cell.mui-media
+      a.mui-navigate-right(href="/console/accountList") 账户列表

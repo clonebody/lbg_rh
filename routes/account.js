@@ -12,7 +12,7 @@ router.get('/', function(req, res, next) {
 router.get('/setting', function(req, res, next) {
     req.app.locals.opr.needLogin(req, res, next);
 }, function(req, res, next) {
-    res.render('setting' , {
+    res.render('accountSetting' , {
         account : res.locals.account,
     });
 });
@@ -23,11 +23,15 @@ router.get('/logout', function(req, res, next) {
 });
 
 router.get('/register', function(req, res, next) {
-    res.render('register' , {});
+    res.render('accountRegister' , { invitation : "" });
+});
+
+router.get('/register/:invitation', function(req, res, next) {
+    res.render('accountRegister' , { invitation : req.params.invitation });
 });
 
 router.post('/action', function(req, res, next) {
-    var action = req.body.action || "login";
+    var action = req.body.action || "";
     var account = req.body.account || "";
     var password = req.body.password || "";
     var invitation = req.body.invitation || "";

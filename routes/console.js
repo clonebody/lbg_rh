@@ -1,54 +1,86 @@
 var express = require('express');
 var router = express.Router();
 
-router.use('/', 
-    function(req, res, next) {
-        if (!req.session || !req.session.account || !req.session.admin) {
-            res.redirect("/");
-        } else {
-            next();
-        }
-    },
-    function(req, res, next) {
-        var db = res.locals.db;
-        if (db) {
-            next();
-        } else {
-            res.render('console' , {
-                context : "no db",
-            });
-        }
-    }
-);
-
-router.get('/', function(req, res, next) {
-    var db = res.locals.db;
-    var dbCol = db.listCollections({}, null);
-
-    console.log(dbCol);
-
-    res.render('console' , {
-        context : "111",
-    });
+router.use('/', function(req, res, next) {
+    if (req.app.get('env') == "development") {
+        next();
+    } else {
+        req.app.locals.opr.needLogin(req, res, function() {
+            if (res.locals.account.admin) {
+                next();
+            } else {
+                res.redirect("/");
+            }
+        });    
+    }    
 });
 
-router.get('/:col', function(req, res, next) {
-    var col = req.params.col;
-    var db = res.locals.db;
+router.get('/', function(req, res, next) {
+    res.render('console' , {});
+});
 
-    db.collection(col).find({}).toArray(function(err, docs) {
-        if (err) {
-            res.render('console' , {
-                context : "no " + col,
-            });
-        } else {
-            console.log(docs)
-            callback(docs);
-            res.render('console' , {
-                context : "222",
-            });
-        };
-    });
+router.get('/invitation', function(req, res, next) {
+    console.log("list inv");
+    req.app.locals.opr.listInvitation()
+        .then(function(list) {
+            res.render('consoleInvitation' , {list : list});
+        })
+});
+
+router.get('/accountList', function(req, res, next) {
+    var start = req.query.start || 0;
+    var num = req.query.num || 10;
+
+    req.app.locals.opr.listAccount(start, num)
+        .then(function(itemList) {
+            res.render('consoleAccountList', {list : itemList});
+        });
+});
+
+router.get('/account/:account', function(req, res, next) {
+    req.app.locals.opr.getAccount(req.params.account)
+        .then(function(itemList) {
+          if(itemList.length == 1) {
+            res.render('consoleAccount', {account : itemList[0]});
+          } else {
+            res.redirect('/console/accountList');
+          }
+        });
+});
+
+router.post('/action', function(req, res, next) {
+    var action = req.body.action || "";
+
+    var success = function() {
+        res.send({ret:"ok"});
+    }
+
+    var fail = function(err) {
+        res.send({ret:"fail", err : err});
+    }
+
+    var opr = req.app.locals.opr;
+    switch(action) {
+    case "addInvitation":
+        opr.newInvitation().then(function(item) {
+            success();
+        }, function(err) {
+            fail(err);
+        })
+        break;
+    case "clearInvitation":
+        opr.clearInvitation().then(function(item) {
+            success();
+        }, function(err) {
+            fail(err);
+        })
+        break;        
+    default:
+        console.log("unknown action :");
+        console.log(req.body);
+        fail("异常操作");
+        break;
+    }
 });
 
 

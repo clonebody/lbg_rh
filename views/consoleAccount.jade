@@ -1,0 +1,11 @@
+extends layout
+
+block head
+  title 账户
+
+block navTitle
+  h1.mui-title 控制台 > 账户 #{account.account}
+
+block content
+  - var str = JSON.stringify(account)
+  p #{str}

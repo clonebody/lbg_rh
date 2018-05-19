@@ -88,6 +88,7 @@ if (app.get('env') != "development") {
     console.log('Connected to MongoDB at: %s', mongoURL);
 
     var accountCol = conn.collection('account');
+    var invitationCol = conn.collection('invitation');
 
     app.locals.opr.newAccount = function(invitation, item) {
       return new Promise((resolve, reject) => {
@@ -95,6 +96,11 @@ if (app.get('env') != "development") {
           reject("邀请码错误");
           return;
         }
+
+        if (item.account == process.env.ADMIN_ACCOUNT) {
+          item.admin = true;
+        }
+
         accountCol.insertOne(item, function(err, r) {
           if (err) {
             reject(err);
@@ -106,28 +112,41 @@ if (app.get('env') != "development") {
     };
   
     app.locals.opr.getAccount = function(account) {
-      return new Promise((resolve, reject) => {
-        accountCol.find({account : account}).toArray(function(err, docs) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(docs);
-          }
-        })
-      })
+      return accountCol.find({account : account}).toArray;
     };
-  })
+
+    app.locals.opr.listAccount = function(start, num) {
+      return accountCol.find({}).skip(start).limit(num).toArray
+    };
+
+    app.locals.opr.newInvitation = function() {
+      return invitationCol.insertOne({invitation : Math.random().toString(36).slice(2)});
+    };
+  
+    app.locals.opr.getInvitation = function(invitation) {
+      return invitationCol.insertOne({invitation : invitation});
+    };
+
+    app.locals.opr.listInvitation = function() {
+      return invitationCol.find().toArray;
+    };
+
+    app.locals.opr.clearInvitation = function() {
+      return invitationCol.deleteMany();
+    };
+  });
 
   sessionConfig.store = new MongoStore({dbPromise: dbPromise});
 } else {
   var accountArray = new Array();
+  var invitationArray = new Array();
 
   app.locals.opr.newAccount = function(invitation, item) {
     return new Promise((resolve, reject) => {
       accountArray.push(item);
       resolve(item);
     })
-  }
+  };
 
   app.locals.opr.getAccount = function(account) {
     return new Promise((resolve, reject) => {
@@ -140,7 +159,62 @@ if (app.get('env') != "development") {
       }
       resolve(ret);
     })
-  }
+  };
+
+  app.locals.opr.listAccount = function(start, num) {
+    return new Promise((resolve, reject) => {
+      var ret = new Array();
+      for (key in accountArray) {
+        if (start > 0) {
+          start --;
+          continue;
+        }
+        if (num > 0) {
+          ret.push(accountArray[key]);
+          num--;
+        } else {
+          break;
+        }
+      }
+      resolve(ret);
+    })
+  };
+
+  app.locals.opr.newInvitation = function() {
+    return new Promise((resolve, reject) => {
+      var item = {invitation : Math.random().toString(36).slice(2)};
+      invitationArray.push(item);
+      resolve(item);
+    })
+  };
+  
+  app.locals.opr.getInvitation = function(invitation) {
+    return new Promise((resolve, reject) => {
+      for (key in invitationArray) {
+        var item = invitationArray[key];
+        if (item.invitation == invitation) {
+          invitationArray.splice(key, 1);
+          resolve(item);
+          return;
+        }
+      }
+      resolve({});
+    })
+    return invitationCol.insertOne({invitation : invitation});
+  };
+
+  app.locals.opr.listInvitation = function() {
+    return new Promise((resolve, reject) => {
+      resolve(invitationArray);
+    })
+  };
+
+  app.locals.opr.clearInvitation = function() {
+    return new Promise((resolve, reject) => {
+      invitationArray = new Array();
+      resolve(invitationArray);
+    })
+  };
 }
 
 app.use(session(sessionConfig));
