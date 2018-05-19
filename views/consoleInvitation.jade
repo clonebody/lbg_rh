@@ -22,7 +22,6 @@ block script
     var tmp = {};
     var evFunction = function(event) {
       var item = mui(this);
-      console.log(item[0].id);
       item.button('loading');
       mui.ajax('/console/action', {
         data: {

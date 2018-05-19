@@ -92,22 +92,22 @@ if (app.get('env') != "development") {
 
     app.locals.opr.newAccount = function(invitation, item) {
       return new Promise((resolve, reject) => {
-        if (invitation != process.env.ADMIN_ACCOUNT) {
-          reject("邀请码错误");
-          return;
-        }
-
-        if (item.account == process.env.ADMIN_ACCOUNT) {
-          item.admin = true;
-        }
-
-        accountCol.insertOne(item, function(err, r) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(item);
-          }
-        })
+        invitationCol.findOneAndDelete({invitation : invitation}).then(
+          function (docs) {
+            console.log("docs");
+            console.log(docs);
+            accountCol.insertOne(item, function(err, r) {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(item);
+              }
+            })
+          },function (err) {
+            console.log("err");
+            console.log(err);
+            })
+          })
       })
     };
   
@@ -124,7 +124,7 @@ if (app.get('env') != "development") {
     };
   
     app.locals.opr.getInvitation = function(invitation) {
-      return invitationCol.insertOne({invitation : invitation});
+      return invitationCol.findOneAndDelete({invitation : invitation});
     };
 
     app.locals.opr.listInvitation = function() {
@@ -188,21 +188,6 @@ if (app.get('env') != "development") {
     })
   };
   
-  app.locals.opr.getInvitation = function(invitation) {
-    return new Promise((resolve, reject) => {
-      for (key in invitationArray) {
-        var item = invitationArray[key];
-        if (item.invitation == invitation) {
-          invitationArray.splice(key, 1);
-          resolve(item);
-          return;
-        }
-      }
-      resolve({});
-    })
-    return invitationCol.insertOne({invitation : invitation});
-  };
-
   app.locals.opr.listInvitation = function() {
     return new Promise((resolve, reject) => {
       resolve(invitationArray);

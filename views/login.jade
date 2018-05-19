@@ -38,36 +38,40 @@ block script
     document.getElementById('login').addEventListener("tap", function(event) {
       var account = document.getElementById('account').value;
       var password = document.getElementById('password').value;
-      var item = mui(this);
-      if (account && password) {
-        item.button('loading');
-        mui.ajax('/account/action', {
-          data: {
-            action : "login",
-            account: account,
-            password : password,
-          },      
-          dataType:'json',//服务器返回json格式数据
-          type:'post',//HTTP请求类型
-          timeout:60000,//超时时间设置为60秒；
-          headers:{'Content-Type':'application/json'},
-          success:function(ret){
-            if (ret.ret == 'ok') {
-              mui.toast("登陆成功");
-              location.reload();
-            } else  {
-              item.button('reset');
-              if (ret.ret == 'fail'){
-                mui.toast(ret.err);
-              } else {
-                console.log(ret);
-              }
-            }
-          },
-          error:function(xhr,type,errorThrown){
-            item.button('reset');
-            console.log(type);
-          },
-        })
+
+      if (!account || !password) {
+        mui.toast("部分单元无内容");
+        return;
       }
+
+      var item = mui(this);
+      item.button('loading');
+      mui.ajax('/account/action', {
+        data: {
+          action : "login",
+          account: account,
+          password : password,
+        },      
+        dataType:'json',//服务器返回json格式数据
+        type:'post',//HTTP请求类型
+        timeout:60000,//超时时间设置为60秒；
+        headers:{'Content-Type':'application/json'},
+        success:function(ret){
+          if (ret.ret == 'ok') {
+            mui.toast("登陆成功");
+            location.reload();
+          } else  {
+            item.button('reset');
+            if (ret.ret == 'fail'){
+              mui.toast(ret.err);
+            } else {
+              console.log(ret);
+            }
+          }
+        },
+        error:function(xhr,type,errorThrown){
+          item.button('reset');
+          console.log(type);
+        },
+      })      
     });

@@ -18,6 +18,9 @@ block content
       label 密码
       input#password.mui-input-clear.mui-input(type="password", placeholder="请输入密码")
     .mui-input-row
+      label 确认密码
+      input#confirmPassword.mui-input-clear.mui-input(type="password", placeholder="请再次输入密码")      
+    .mui-input-row
       label 邀请码
       input#invitation.mui-input-clear.mui-input(type="text", placeholder="请输入邀请码", value="#{invitation}")
   .mui-content-padded
@@ -26,41 +29,51 @@ block content
 block script
   script.
     document.getElementById('register').addEventListener("tap", function(event) {
-      var account = document.getElementById('account').value;
+       var account = document.getElementById('account').value;
       var password = document.getElementById('password').value;
+      var confirmPassword = document.getElementById('confirmPassword').value;
       var invitation = document.getElementById('invitation').value;
-      var item = mui(this);
-      if (account && password) {
-        item.button('loading');
-        mui.ajax('/account/action', {
-          data: {
-            action : "register",
-            account: account,
-            password : password,
-            invitation : invitation,
-          },      
-          dataType:'json',//服务器返回json格式数据
-          type:'post',//HTTP请求类型
-          timeout:60000,//超时时间设置为60秒；
-          headers:{'Content-Type':'application/json'},
-          success:function(ret){
-            if (ret.ret == 'ok') {
-              mui.toast("注册成功");
-              location="/account"
-            } else  {
-              item.button('reset');
-              if (ret.ret == 'fail'){
-                mui.toast(ret.err);
-              } else {
-                console.log(ret);
-              }
-            }
-          },
-          error:function(xhr,type,errorThrown){
-            //异常处理；
-            item.button('reset');
-            console.log(type);
-          },
-        })
+
+      if (!account || !password || !confirmPassword || !invitation) {
+        mui.toast("部分单元无内容");
+        return;
       }
+      
+      if (password != confirmPassword) {
+        mui.toast("两次密码不同");
+        return;
+      }
+
+      var item = mui(this);
+      item.button('loading');
+      mui.ajax('/account/action', {
+        data: {
+          action : "register",
+          account: account,
+          password : password,
+          invitation : invitation,
+        },      
+        dataType:'json',//服务器返回json格式数据
+        type:'post',//HTTP请求类型
+        timeout:60000,//超时时间设置为60秒；
+        headers:{'Content-Type':'application/json'},
+        success:function(ret){
+          if (ret.ret == 'ok') {
+            mui.toast("注册成功");
+            location="/account"
+          } else  {
+            item.button('reset');
+            if (ret.ret == 'fail'){
+              mui.toast(ret.err);
+            } else {
+              console.log(ret);
+            }
+          }
+        },
+        error:function(xhr,type,errorThrown){
+          //异常处理；
+          item.button('reset');
+          console.log(type);
+        },
+      })
     });
