@@ -112,11 +112,11 @@ if (app.get('env') != "development") {
     };
   
     app.locals.opr.getAccount = function(account) {
-      return accountCol.find({account : account}).toArray;
+      return accountCol.find({account : account}).toArray();
     };
 
     app.locals.opr.listAccount = function(start, num) {
-      return accountCol.find({}).skip(start).limit(num).toArray
+      return accountCol.find({}).skip(start).limit(num).toArray();
     };
 
     app.locals.opr.newInvitation = function() {
@@ -128,11 +128,11 @@ if (app.get('env') != "development") {
     };
 
     app.locals.opr.listInvitation = function() {
-      return invitationCol.find().toArray;
+      return invitationCol.find().toArray();
     };
 
     app.locals.opr.clearInvitation = function() {
-      return invitationCol.deleteMany();
+      return invitationCol.deleteMany({});
     };
   });
 
