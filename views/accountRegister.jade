@@ -29,7 +29,7 @@ block content
 block script
   script.
     document.getElementById('register').addEventListener("tap", function(event) {
-       var account = document.getElementById('account').value;
+      var account = document.getElementById('account').value;
       var password = document.getElementById('password').value;
       var confirmPassword = document.getElementById('confirmPassword').value;
       var invitation = document.getElementById('invitation').value;
@@ -52,7 +52,7 @@ block script
           account: account,
           password : password,
           invitation : invitation,
-        },      
+        },
         dataType:'json',//服务器返回json格式数据
         type:'post',//HTTP请求类型
         timeout:60000,//超时时间设置为60秒；

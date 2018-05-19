@@ -59,6 +59,8 @@ router.post('/action', function(req, res, next) {
         res.send({ret:"fail", err : err});
     }
 
+    console.log(req.body);
+
     var opr = req.app.locals.opr;
     switch(action) {
     case "addInvitation":
@@ -74,7 +76,14 @@ router.post('/action', function(req, res, next) {
         }, function(err) {
             fail(err);
         })
-        break;        
+        break;
+    case "delAccount":
+        opr.delAccount(req.body.account).then(function(item) {
+            success();
+        }, function(err) {
+            fail(err);
+        })
+        break;
     default:
         console.log("unknown action :");
         console.log(req.body);

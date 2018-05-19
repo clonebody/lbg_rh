@@ -4,11 +4,47 @@ block head
   title 账户
 
 block navTitle
-  h1.mui-title 控制台 > 账户 #{account.account}
+  h1.mui-title 控制台 > 账户
 
 block content
+  .mui-content-padded
+    button#delAccount.mui-btn.mui-btn-block.mui-btn-danger(data-loading-text="删除中") 删除#{account.account}
   ul.mui-table-view.mui-table-view-chevron
     - each value, key in account
       h4 #{key}
       li.mui-table-view-cell.mui-media
         .mui-media-body #{value}
+
+block script
+  script.
+    document.getElementById('delAccount').addEventListener("tap", function(event) {
+      var item = mui(this);
+      item.button('loading');
+      mui.ajax('/console/action', {
+        data: {
+          action : "delAccount",
+          account: "#{account.account}",
+        },
+        dataType:'json',//服务器返回json格式数据
+        type:'post',//HTTP请求类型
+        timeout:60000,//超时时间设置为60秒；
+        headers:{'Content-Type':'application/json'},
+        success:function(ret){
+          if (ret.ret == 'ok') {
+            mui.toast("删除成功");
+            location="/console/accountList"
+          } else  {
+            item.button('reset');
+            if (ret.ret == 'fail'){
+              mui.toast(ret.err);
+            } else {
+              console.log(ret);
+            }
+          }
+        },
+        error:function(xhr,type,errorThrown){
+          item.button('reset');
+          console.log(type);
+        },
+      })
+    });

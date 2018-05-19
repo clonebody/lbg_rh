@@ -19,14 +19,13 @@ block content
 
 block script
   script.
-    var tmp = {};
     var evFunction = function(event) {
       var item = mui(this);
       item.button('loading');
       mui.ajax('/console/action', {
         data: {
           action : item[0].id,
-        },      
+        },
         dataType:'json',//服务器返回json格式数据
         type:'post',//HTTP请求类型
         timeout:60000,//超时时间设置为60秒；

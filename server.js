@@ -112,6 +112,10 @@ if (app.get('env') != "development") {
           })
       })
     };
+
+    app.locals.opr.delAccount = function(account) {
+      return accountCol.deleteOne({account : account});
+    };
   
     app.locals.opr.getAccount = function(account) {
       return accountCol.find({account : account}).toArray();
@@ -161,6 +165,18 @@ if (app.get('env') != "development") {
       }
       resolve(ret);
     })
+  };
+
+  app.locals.opr.delAccount = function(account) {
+    return new Promise((resolve, reject) => {
+      for (key in accountArray) {
+        if (accountArray[key].account == account) {
+          accountArray.splice(key, 1);
+          resolve({});
+          return;
+        }
+      };
+    });
   };
 
   app.locals.opr.listAccount = function(start, num) {
