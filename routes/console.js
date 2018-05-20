@@ -1,18 +1,20 @@
 var express = require('express');
 var router = express.Router();
+var path = require('path');
+var needLogin = require(path.join(__dirname, 'needLogin'));
 
 router.use('/', function(req, res, next) {
     if (req.app.get('env') == "development") {
         next();
     } else {
-        req.app.locals.opr.needLogin(req, res, function() {
+        needLogin(req, res, function() {
             if (res.locals.account.admin) {
                 next();
             } else {
                 res.redirect("/");
             }
-        });    
-    }    
+        });
+    }
 });
 
 router.get('/', function(req, res, next) {
@@ -43,7 +45,7 @@ router.get('/account/:account', function(req, res, next) {
           if(itemList.length == 1) {
             res.render('consoleAccount', {account : itemList[0]});
           } else {
-            res.redirect('/console/accountList');
+            res.redirect(req.baseUrl + '/accountList');
           }
         });
 });

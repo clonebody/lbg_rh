@@ -1,21 +1,23 @@
 var express = require('express');
 var router = express.Router();
+var path = require('path');
+var needLogin = require(path.join(__dirname, 'needLogin'));
 
-router.get('/', function(req, res, next) {
-    req.app.locals.opr.needLogin(req, res, next);
-}, function(req, res, next) {
-    res.render('account' , {
-        account : res.locals.account,
-    });
-});
+router.get('/', needLogin,
+    function(req, res, next) {
+        res.render('account' , {
+            account : res.locals.account,
+        });
+    }
+);
 
-router.get('/setting', function(req, res, next) {
-    req.app.locals.opr.needLogin(req, res, next);
-}, function(req, res, next) {
-    res.render('accountSetting' , {
-        account : res.locals.account,
-    });
-});
+router.get('/setting', needLogin,
+    function(req, res, next) {
+        res.render('accountSetting' , {
+            account : res.locals.account,
+        });
+    }
+);
 
 router.get('/logout', function(req, res, next) {
     req.session.destroy();

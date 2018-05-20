@@ -4,23 +4,15 @@ block head
   title 设置
 
 block navTitle
-  h1.mui-title 设置
+  .mui-title 设置
 
 block content
-  ul.mui-table-view.mui-table-view-chevron
-    li.mui-table-view-cell.mui-media
-      a.mui-navigate-right(href="account/setting")
-        img#head-img.mui-media-object.mui-pull-left.head-img(src="")
-        .mui-media-body 账户 <br> #{account}
-  .mui-content-padded
-    h5 参与游戏列表
-  ul.mui-table-view.mui-table-view-chevron
-    li.mui-table-view-cell.mui-media
-      a.mui-navigate-right(href="/tableSetting/1/")
-        .mui-media-body 123<br>234525<br>
-    li.mui-table-view-cell.mui-media
-      a.mui-navigate-right(href="/tableSetting/2/")
-        .mui-media-body 123<br>234525<br>
+  -var isAdmin = ("admin" in account) && account.admin
+  if isAdmin
+    ul.mui-table-view.mui-table-view-chevron
+      li.mui-table-view-cell.mui-media
+        a.mui-navigate-right(href="/console")
+          .mui-media-body 控制台
   .mui-content-padded
     button#tableList.mui-btn.mui-btn-block.mui-btn-danger 退出
 

@@ -1,10 +1,22 @@
-doctype html
-html
-  head
-    meta(charset="UTF-8")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0")
-    title 桌一览
-    style body {height: 100%; margin: 0; padding: 0}
-  body
-    each item in tables
-      a(href='/tableSetting/#{item.tableId}/') 第1桌
+extends layout
+
+block head
+  title 游戏桌列表
+
+block navTitle
+  .mui-title 游戏桌列表
+
+block content
+  .mui-content-padded
+    button#newTable.mui-btn.mui-btn-block.mui-btn-primary 创建游戏桌
+  ul.mui-table-view.mui-table-view-chevron
+    - each table in list
+      li.mui-table-view-cell.mui-media
+        a.mui-navigate-right(href="/table/setting?tableId=#{table.tableId}")
+          .mui-media-body ###{table.tableId}
+
+block script
+  script.
+    document.getElementById('newTable').addEventListener("tap", function(event) {
+
+    });
