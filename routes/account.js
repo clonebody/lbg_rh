@@ -51,42 +51,43 @@ router.post('/action', function(req, res, next) {
         var opr = req.app.locals.opr;
         switch(action) {
         case "register":
-            opr.getAccount(account).then(function(itemList) {
-                if (itemList.length == 0) {
-                    opr.newAccount(invitation, {account : account, password : password}).then(
-                        function(item) {
-                            success();
-                        },
-                        function(err) {
-                            fail(err);
-                        }
-                    );
-                } else {
-                    fail("用户已存在");
-                } 
-            }, function(err) {
-                fail(err);
-            })
+            opr.addAccount(invitation, account, password).then(
+                (ret) => {
+                    console.log("success");
+                    console.log(ret);
+                    success();
+                },
+                (err) => {
+                    console.log("fail");
+                    console.log(err);
+                    fail(err);
+                }
+            );
             break;
         case "login":
-            opr.getAccount(account).then(function(itemList) {
-                if (itemList.length == 1) {
-                    var item = itemList[0];
+            opr.findAccount(account, password).then((ret) => {
+                success();
+            }, (err) => {
+                fail(err);
+            });
+            opr.getAccount(account).then((list) => {
+                if (list.length == 1) {
+                    var item = list[0];
                     if (item.password == password) {
                         success();
                     } else {
                         fail("密码错误");
                     }
                 } else {
-                    if (itemList != 0) {
+                    if (list != 0) {
                         console.log("dup account");
-                        console.log(itemList);
+                        console.log(list);
                     }
                     fail("用户不存在");
-                }
-            }, function(err) {
+                }                    
+            }, (err) => {
                 fail(err);
-            })
+            });
             break;
         default:
             console.log("unknown action :");

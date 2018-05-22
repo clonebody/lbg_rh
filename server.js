@@ -12,6 +12,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(morgan('combined'))
 app.use(express.static(path.join(__dirname, 'public')));
+require(path.join(__dirname, 'games/info'))(express, app);
 
 var bodyParser = require('body-parser');
 
@@ -32,6 +33,8 @@ var sessionConfig = {
   resave: false,
 }
 
+var opr = require(path.join(__dirname, 'operation'))
+
 if (mongoURL) {
   //  mongoDB
   var mongodb = require('mongodb');
@@ -39,13 +42,15 @@ if (mongoURL) {
 
   dbPromise.then(function(conn) {
     console.log('Connected to MongoDB at: %s', mongoURL);
-    app.locals.opr = require(path.join(__dirname, 'mongoOpr'))(conn);
+    var dataOpr = require(path.join(__dirname, 'mongoDataOpr'))(conn);
+    app.locals.opr = opr(dataOpr);
   })
 
   sessionConfig.store = new MongoStore({dbPromise: dbPromise});
 } else {
   //  mem
-  app.locals.opr = require(path.join(__dirname, 'memOpr'));
+  var dataOpr = require(path.join(__dirname, 'memDataOpr'));
+  app.locals.opr = opr(dataOpr);
 };
 
 app.use(session(sessionConfig));
