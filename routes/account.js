@@ -51,26 +51,19 @@ router.post('/action', function(req, res, next) {
         var opr = req.app.locals.opr;
         switch(action) {
         case "register":
-            opr.addAccount(invitation, account, password).then(
-                (ret) => {
-                    console.log("success");
-                    console.log(ret);
-                    success();
-                },
-                (err) => {
-                    console.log("fail");
-                    console.log(err);
-                    fail(err);
-                }
+            opr.addAccount(invitation, account, password).then((ret) => {
+                console.log("success");
+                console.log(ret);
+                success();
+            }, (err) => {
+                console.log("fail");
+                console.log(err);
+                fail(err);
+            }
             );
             break;
         case "login":
-            opr.findAccount(account, password).then((ret) => {
-                success();
-            }, (err) => {
-                fail(err);
-            });
-            opr.getAccount(account).then((list) => {
+            opr.findAccount(account).then((list) => {
                 if (list.length == 1) {
                     var item = list[0];
                     if (item.password == password) {
