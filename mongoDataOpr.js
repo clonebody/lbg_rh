@@ -1,7 +1,6 @@
-console.log("mon mod");
 module.exports = function(conn) {
   return {
-    getCounter = function(countId) {
+    getCounter : function(countId) {
       return conn.collection('param').findOneAndUpdate({_id : countId}, {$inc: {value:1}}, {upsert: true});
     },
 

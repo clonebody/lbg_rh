@@ -43,8 +43,6 @@ if (mongoURL) {
   dbPromise.then(function(conn) {
     console.log('Connected to MongoDB at: %s', mongoURL);
     var dataOpr = require(path.join(__dirname, 'mongoDataOpr'))(conn);
-    console.log("mon finish");
-    console.log(dataOpr);
     app.locals.opr = opr(dataOpr);
   })
 

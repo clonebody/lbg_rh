@@ -3,7 +3,6 @@ var accountName = "account";
 var tableName = "table";
 
 module.exports = function(dataOpr) {
-  console.log("opr");
   return {
     addInvitation : function() {
       return dataOpr.addItem(invitationName, {invitation : Math.random().toString(36).slice(2, 10)});
