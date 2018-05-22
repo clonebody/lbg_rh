@@ -20,8 +20,9 @@ module.exports = function(dataOpr) {
         .then((list) => {
           if (list.length != 0) {
             reject("用户已存在")
-          }
-          return dataOpr.findAndDeleteItem(invitationName, {invitation : invitation});
+          } else {
+            return dataOpr.findAndDeleteItem(invitationName, {invitation : invitation});  
+          }          
         }, reject).then((ret) => {
           if ((account == process.env.ADMIN_ACCOUNT) || (ret.lastErrorObject.n == 1)) {
             var item = {
