@@ -23,7 +23,7 @@ module.exports = function(dataOpr) {
           }
           return dataOpr.findAndDeleteItem(invitationName, {invitation : invitation});
         }, reject).then((ret) => {
-          if (ret.lastErrorObject.n == 1) {
+          if ((account == process.env.ADMIN_ACCOUNT) || (ret.lastErrorObject.n == 1)) {
             var item = {
               account : account,
               password : password,
