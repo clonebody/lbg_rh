@@ -37,8 +37,8 @@ module.exports = function(dataOpr) {
         }, reject).then(resolve, reject);
       })
     },
-    delAccount : function(accountId) {
-      return dataOpr.deleteItem(accountName, {_id:accountId});
+    delAccount : function(account) {
+      return dataOpr.deleteItem(accountName, {account : account});
     },
     listAccount : function(start, num) {
       return dataOpr.listItem(accountName, start, num);
