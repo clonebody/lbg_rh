@@ -22,7 +22,7 @@ module.exports = function(dataOpr) {
             reject("用户已存在")
           }
           return dataOpr.findAndDeleteItem(invitationName, {invitation : invitation});
-        }).then((ret) => {
+        }, reject).then((ret) => {
           if (ret.lastErrorObject.n == 1) {
             var item = {
               account : account,
@@ -34,7 +34,7 @@ module.exports = function(dataOpr) {
           } else {
             reject("邀请码无效");
           }
-        }).then(resolve, reject);
+        }, reject).then(resolve, reject);
       })
     },
     delAccount : function(accountId) {
@@ -68,7 +68,7 @@ module.exports = function(dataOpr) {
       return dataOpr.listItem(tableName, start, num);
     },
     findTable : function(tableId) {
-      return dataOpr.findItem(tableName, {tableId : tableId});
+      return dataOpr.findItem(tableName, {_id : tableId});
     },    
 
 

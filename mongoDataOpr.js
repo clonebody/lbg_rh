@@ -1,7 +1,7 @@
 module.exports = function(conn) {
   return {
     getCounter = function(countId) {
-      return conn.collection('param').findOneAndUpdate({_id : countId}, {$inc: {value:1}}, {upsert: true})
+      return conn.collection('param').findOneAndUpdate({_id : countId}, {$inc: {value:1}}, {upsert: true});
     },
 
     addItem : function(table, item) {
@@ -9,7 +9,7 @@ module.exports = function(conn) {
     },
 
     deleteItem : function(table, item) {
-      return conn.collection(table).insertOne(item);
+      return conn.collection(table).deleteOne(item);
     },
 
     listItem : function(table, start, num) {
