@@ -4,7 +4,7 @@ module.exports = function(req, res, next) {
     } else {
         req.app.locals.opr.findAccount(req.session.account)
             .then(function(itemList) {
-                if(itemList.length == 1) {
+                if(itemList.length != 0) {
                     res.locals.account = itemList[0];
                     next();
                 } else {
