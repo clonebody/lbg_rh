@@ -39,7 +39,7 @@ router.get('/accountList', function(req, res, next) {
 
 router.get('/account/:account', function(req, res, next) {
     req.app.locals.opr.findAccount(req.params.account).then((list) => {
-        if(list.length == 1) {
+        if(list.length != 0) {
           res.render('consoleAccount', {account : list[0]});
         } else {
           res.redirect(req.baseUrl + '/accountList');
