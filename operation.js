@@ -16,26 +16,25 @@ module.exports = function(dataOpr) {
 
     addAccount : function(invitation, account, password) {
       return new Promise((resolve, reject) => {
-        dataOpr.findItem(accountName, {account : account})
-        .then((list) => {
+        dataOpr.findItem(accountName, {account : account}).then((list) => {
           if (list.length != 0) {
             reject("用户已存在")
           } else {
-            return dataOpr.findAndDeleteItem(invitationName, {invitation : invitation});  
+            dataOpr.findAndDeleteItem(invitationName, {invitation : invitation}).then((ret) => {
+              if ((account == process.env.ADMIN_ACCOUNT) || (ret.lastErrorObject.n == 1)) {
+                var item = {
+                  account : account,
+                  password : password,
+                  nickname : account,
+                  admin : (account == process.env.ADMIN_ACCOUNT),
+                }
+                dataOpr.addItem(accountName, item).then(resolve, reject);
+              } else {
+                reject("邀请码无效");
+              }
+            })
           }          
-        }, reject).then((ret) => {
-          if ((account == process.env.ADMIN_ACCOUNT) || (ret.lastErrorObject.n == 1)) {
-            var item = {
-              account : account,
-              password : password,
-              nickname : account,
-              admin : (account == process.env.ADMIN_ACCOUNT),
-            }
-            return dataOpr.addItem(accountName, item);
-          } else {
-            reject("邀请码无效");
-          }
-        }, reject).then(resolve, reject);
+        }, reject)
       })
     },
     delAccount : function(account) {
