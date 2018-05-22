@@ -1,3 +1,4 @@
+console.log("mon mod");
 module.exports = function(conn) {
   return {
     getCounter = function(countId) {
