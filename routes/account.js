@@ -64,7 +64,7 @@ router.post('/action', function(req, res, next) {
             break;
         case "login":
             opr.findAccount(account).then((list) => {
-                if (list.length != 1) {
+                if (list.length != 0) {
                     var item = list[0];
                     if (item.password == password) {
                         success();
