@@ -56,7 +56,7 @@ if (mongoURL) {
 app.use(session(sessionConfig));
 
 app.get('/', function (req, res) {
-  res.render('home', {});
+  res.render('home', {ver : "0.1"});
 });
 
 app.get('/pagecount', function (req, res) {
